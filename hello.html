@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>All-in-One Application</title>
+  <style>
+    section { margin-bottom: 50px; padding: 20px; border: 1px solid #ccc; }
+    h2 { margin-top: 0; }
+  </style>
+</head>
+<body>
+  <h1>All-in-One Application</h1>
+
+  <!-- Login Page -->
+  <section>
+    <h2>Login Page</h2>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
+    <p id="loginMessage"></p>
+  </section>
+
+  <!-- Number Guessing Game -->
+  <section>
+    <h2>Number Guessing Game</h2>
+    <p>Guess a number between 1 and 10. You have 5 attempts.</p>
+    <input type="number" id="guess" min="1" max="10" />
+    <button id="submitGuess">Submit</button>
+    <p id="guessFeedback"></p>
+  </section>
+
+  <!-- To-Do List -->
+  <section>
+    <h2>To-Do List</h2>
+    <input type="text" id="taskInput" placeholder="Add a task" />
+    <button id="addTask">Add</button>
+    <ul id="taskList"></ul>
+  </section>
+
+  <!-- Quiz Application -->
+  <section>
+    <h2>Quiz Application</h2>
+    <form id="quizForm"></form>
+    <button id="submitQuiz">Submit Quiz</button>
+    <p id="quizResult"></p>
+  </section>
+
+  <!-- Shopping Cart -->
+  <section>
+    <h2>Shopping Cart</h2>
+    <input type="text" id="itemName" placeholder="Item Name" />
+    <input type="number" id="itemPrice" placeholder="Item Price" />
+    <button id="addItem">Add Item</button>
+    <ul id="cartList"></ul>
+    <p id="cartTotal"></p>
+  </section>
+
+  <script>
+    // Login Page
+    const validUsername = "admin";
+    const validPassword = "1234";
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+      event.preventDefault();
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+      const message = document.getElementById("loginMessage");
+      if (username === validUsername && password === validPassword) {
+        message.textContent = "Login successful!";
+      } else {
+        message.textContent = "Invalid credentials.";
+      }
+    });
+
+    // Number Guessing Game
+    const targetNumber = Math.floor(Math.random() * 10) + 1;
+    let attempts = 5;
+    document.getElementById("submitGuess").addEventListener("click", function() {
+      if (attempts > 0) {
+        const userGuess = Number(document.getElementById("guess").value);
+        attempts--;
+        if (userGuess === targetNumber) {
+          document.getElementById("guessFeedback").textContent = "Correct! The number was " + targetNumber;
+        } else if (userGuess > targetNumber) {
+          document.getElementById("guessFeedback").textContent = "Too high! Attempts left: " + attempts;
+        } else {
+          document.getElementById("guessFeedback").textContent = "Too low! Attempts left: " + attempts;
+        }
+      } else {
+        document.getElementById("guessFeedback").textContent = "Game over! The number was " + targetNumber;
+      }
+    });
+
+    // To-Do List
+    const tasks = [];
+    function renderTasks() {
+      const taskList = document.getElementById("taskList");
+      taskList.innerHTML = "";
+      tasks.forEach((task) => {
+        const li = document.createElement("li");
+        li.textContent = task;
+        li.style.cursor = "pointer";
+        li.addEventListener("click", () => {
+          li.style.textDecoration = "line-through";
+        });
+        taskList.appendChild(li);
+      });
+    }
+    document.getElementById("addTask").addEventListener("click", function() {
+      const task = document.getElementById("taskInput").value.trim();
+      if (task) {
+        tasks.push(task);
+        document.getElementById("taskInput").value = "";
+        renderTasks();
+      }
+    });
+
+    // Quiz Application
+    const questions = [
+      { question: "2 + 2?", options: ["3", "4", "5"], answer: "4" },
+      { question: "5 - 3?", options: ["3", "2", "1"], answer: "2" },
+      { question: "Capital of France?", options: ["Berlin", "Paris", "Rome"], answer: "Paris" }
+    ];
+    const quizForm = document.getElementById("quizForm");
+    questions.forEach((q, index) => {
+      const div = document.createElement("div");
+      div.innerHTML = `<p>${q.question}</p>`;
+      q.options.forEach(option => {
+        div.innerHTML += `
+          <label>
+            <input type="radio" name="q${index}" value="${option}" /> ${option}
+          </label><br>`;
+      });
+      quizForm.appendChild(div);
+    });
+    document.getElementById("submitQuiz").addEventListener("click", function() {
+      let score = 0;
+      questions.forEach((q, index) => {
+        const selected = document.querySelector(`input[name="q${index}"]:checked`);
+        if (selected && selected.value === q.answer) {
+          score++;
+        }
+      });
+      document.getElementById("quizResult").textContent = `Score: ${score}/${questions.length}`;
+    });
+
+    // Shopping Cart
+    const cart = [];
+    const discountThreshold = 100;
+    const discountRate = 0.1;
+    function renderCart() {
+      const cartList = document.getElementById("cartList");
+      const totalElem = document.getElementById("cartTotal");
+      cartList.innerHTML = "";
+      let total = 0;
+      cart.forEach(item => {
+        total += item.price;
+        const li = document.createElement("li");
+        li.textContent = `${item.name}: $${item.price}`;
+        cartList.appendChild(li);
+      });
+      if (total > discountThreshold) {
+        total -= total * discountRate;
+      }
+      totalElem.textContent = `Total: $${total.toFixed(2)}`;
+    }
+    document.getElementById("addItem").addEventListener("click", function() {
+      const name = document.getElementById("itemName").value.trim();
+      const price = parseFloat(document.getElementById("itemPrice").value);
+      if (name && price) {
+        cart.push({ name, price });
+        renderCart();
+      }
+    });
+  </script>
+</body>
+</html>
